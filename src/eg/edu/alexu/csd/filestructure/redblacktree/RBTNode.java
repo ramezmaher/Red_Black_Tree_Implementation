@@ -7,6 +7,16 @@ public class RBTNode<T extends Comparable<T>,V> implements INode<T, V> {
 	private INode<T,V> Parent;
 	private INode<T,V> RightChild;
 	private INode<T,V> LeftChild;
+	
+	public RBTNode(T key,V value){
+		this.Color = RED;
+		this.Key=key;
+		this.Value=value;
+		this.Parent=null;
+		this.LeftChild=null;
+		this.RightChild=null; 
+	}
+	
 	@Override
 	public void setParent(INode<T, V> parent) {
 		this.Parent=parent; 
