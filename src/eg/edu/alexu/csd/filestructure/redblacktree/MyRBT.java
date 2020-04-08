@@ -95,18 +95,51 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		else if (check < 0) {
 			if (node.getRightChild()==null)
 				return null;
-			else Find(key,node.getRightChild());
+			else return Find(key,node.getRightChild());
 		}
 		else {
 			if (node.getLeftChild()==null)
 				return null;
-			else Find(key,node.getLeftChild());
+			else return Find(key,node.getLeftChild());
 		}
-			return null;
 	}
 	
 	private void fixTree() {
 		
 	}
 	private void checkViolation() {}
+	
+	private void LeftRotation(INode<T,V> node) {
+		if (node==null || node.getLeftChild()==null)
+			return;
+		INode<T,V> dummy1 = node.getLeftChild();
+		INode<T,V> dummy2 = dummy1.getRightChild();
+		node.setLeftChild(dummy2);
+		dummy1.setRightChild(node);
+		if (node.getParent()!=null)
+			dummy1.setParent(node.getParent());
+		else {
+			dummy1.setParent(null);
+			root = dummy1;
+		}
+		dummy2.setParent(node);
+		return;
+	}
+	private void RightRotation(INode<T,V> node) {
+		if (node==null || node.getRightChild()==null)
+			return;
+		INode<T,V> dummy1 = node.getRightChild();
+		INode<T,V> dummy2 = dummy1.getLeftChild();
+		node.setRightChild(dummy2);
+		dummy1.setLeftChild(node);
+		if (node.getParent()!=null)
+			dummy1.setParent(node.getParent());
+		else {
+			dummy1.setParent(null);
+			root = dummy1;
+		}
+		dummy2.setParent(node);
+		return;
+	}
+    
 }
