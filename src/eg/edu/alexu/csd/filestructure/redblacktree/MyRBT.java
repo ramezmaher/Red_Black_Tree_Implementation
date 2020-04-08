@@ -1,4 +1,6 @@
 package eg.edu.alexu.csd.filestructure.redblacktree;
+import java.util.*;
+
 
 public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	private INode<T,V> root;
@@ -109,7 +111,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	}
 	private void checkViolation() {}
 	
-	private void LeftRotation(INode<T,V> node) {
+	public void LeftRotation(INode<T,V> node) {
 		if (node==null || node.getLeftChild()==null)
 			return;
 		INode<T,V> dummy1 = node.getLeftChild();
@@ -125,7 +127,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		dummy2.setParent(node);
 		return;
 	}
-	private void RightRotation(INode<T,V> node) {
+	public void RightRotation(INode<T,V> node) {
 		if (node==null || node.getRightChild()==null)
 			return;
 		INode<T,V> dummy1 = node.getRightChild();
@@ -140,6 +142,31 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 		dummy2.setParent(node);
 		return;
+	}
+	public void printTree(INode<T,V> node) {
+		if (node==null)
+			return;
+		else {
+			System.out.println(node.getKey());
+			printTree(node.getRightChild());
+			printTree(node.getLeftChild());
+		}
+	}
+	public static void main(String[] args) {
+	    MyRBT<Integer,String> tree = new MyRBT<Integer,String>();
+	    tree.insert(10, "hi");
+	    tree.insert(15, "ho");
+	    tree.insert(2, "he");
+	    tree.insert(300, "ha");
+	    tree.insert(4, "hu");
+	    tree.insert(14, "hu");
+	    tree.insert(16, "hu");
+	    tree.insert(9, "hu");
+	    tree.insert(1, "hu");
+	    tree.insert(0, "hu");
+	    tree.RightRotation(tree.getRoot());
+	    tree.printTree(tree.getRoot());
+
 	}
     
 }
