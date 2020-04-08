@@ -23,20 +23,30 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	}
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
+		if (root==null)
+			return;
+		root.setLeftChild(null);
+		root.setRightChild(null);
+		root=null;
+		return;
 		
 	}
 
 	@Override
 	public V search(T key) {
-		// TODO Auto-generated method stub
+		INode<T,V> node = Find(key,root);
+		if (node == null)
 		return null;
+		else return node.getValue();
 	}
 
 	@Override
 	public boolean contains(T key) {
-		// TODO Auto-generated method stub
-		return false;
+		INode<T,V> node= Find(key,root);
+		if(node==null)
+			return false;
+		else return true;
+		
 	}
 
 	@Override
@@ -49,7 +59,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			return;
 		}
 		else {
-			
+			addTo(node,root);
 		}
 	}
 
@@ -59,7 +69,44 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		return false;
 	}
 	private void addTo(INode<T,V> nodeToAdd,INode<T,V> parentNode) {
+		int check = nodeToAdd.getKey().compareTo(parentNode.getKey());
+		if (check > 0) {
+			if (parentNode.getLeftChild()==null) {
+				parentNode.setLeftChild(nodeToAdd);
+				nodeToAdd.setParent(parentNode);
+			}
+			else addTo(nodeToAdd,parentNode.getLeftChild());
+		}
+		else if(check < 0) {
+			if (parentNode.getRightChild()==null) {
+				parentNode.setRightChild(nodeToAdd);
+				nodeToAdd.setParent(parentNode);
+			}
+			else addTo(nodeToAdd,parentNode.getRightChild());
+		}
+		else {
+			parentNode.setValue(nodeToAdd.getValue());
+		}
+	}
+	private INode<T,V> Find(T key,INode<T,V> node) {
+		int check = node.getKey().compareTo(key);
+		if (check==0)
+			return node;
+		else if (check < 0) {
+			if (node.getRightChild()==null)
+				return null;
+			else Find(key,node.getRightChild());
+		}
+		else {
+			if (node.getLeftChild()==null)
+				return null;
+			else Find(key,node.getLeftChild());
+		}
+			return null;
+	}
+	
+	private void fixTree() {
 		
 	}
-
+	private void checkViolation() {}
 }
