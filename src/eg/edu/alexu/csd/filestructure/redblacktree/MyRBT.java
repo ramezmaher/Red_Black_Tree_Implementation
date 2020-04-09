@@ -94,7 +94,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		int check = node.getKey().compareTo(key);
 		if (check==0)
 			return node;
-		else if (check < 0) {
+		else if (check > 0) {
 			if (node.getRightChild()==null)
 				return null;
 			else return Find(key,node.getRightChild());
@@ -118,12 +118,18 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		INode<T,V> dummy2 = dummy1.getRightChild();
 		node.setLeftChild(dummy2);
 		dummy1.setRightChild(node);
-		if (node.getParent()!=null)
+		if (node.getParent()!=null) {
 			dummy1.setParent(node.getParent());
+			if (dummy1.getKey().compareTo(dummy1.getParent().getKey()) < 0 )
+		    	dummy1.getParent().setRightChild(dummy1);
+		    else 
+		    	dummy1.getParent().setLeftChild(dummy1);
+		}
 		else {
 			dummy1.setParent(null);
 			root = dummy1;
 		}
+		if (dummy2 != null)
 		dummy2.setParent(node);
 		return;
 	}
@@ -134,12 +140,18 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		INode<T,V> dummy2 = dummy1.getLeftChild();
 		node.setRightChild(dummy2);
 		dummy1.setLeftChild(node);
-		if (node.getParent()!=null)
+		if (node.getParent()!=null) {
 			dummy1.setParent(node.getParent());
+		    if (dummy1.getKey().compareTo(dummy1.getParent().getKey()) < 0 )
+		    	dummy1.getParent().setRightChild(dummy1);
+		    else 
+		    	dummy1.getParent().setLeftChild(dummy1);
+		}
 		else {
 			dummy1.setParent(null);
 			root = dummy1;
 		}
+		if (dummy2 != null)
 		dummy2.setParent(node);
 		return;
 	}
@@ -164,7 +176,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    tree.insert(9, "hu");
 	    tree.insert(1, "hu");
 	    tree.insert(0, "hu");
-	    tree.RightRotation(tree.getRoot());
+	    tree.LeftRotation(tree.Find(2,tree.getRoot()));
+	    tree.RightRotation(tree.Find(15,tree.getRoot()));
 	    tree.printTree(tree.getRoot());
 
 	}
