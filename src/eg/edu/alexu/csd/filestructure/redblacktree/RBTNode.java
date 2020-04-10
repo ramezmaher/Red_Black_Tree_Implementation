@@ -7,6 +7,7 @@ public class RBTNode<T extends Comparable<T>,V> implements INode<T, V> {
 	private INode<T,V> Parent;
 	private INode<T,V> RightChild;
 	private INode<T,V> LeftChild;
+	private boolean isNull;
 	
 	public RBTNode(T key,V value){
 		this.Color = RED;
@@ -15,6 +16,18 @@ public class RBTNode<T extends Comparable<T>,V> implements INode<T, V> {
 		this.Parent=null;
 		this.LeftChild=null;
 		this.RightChild=null; 
+		this.isNull=false;
+	}
+	
+	public RBTNode()
+	{
+		this.Color = BLACK;
+		this.Key = null;
+		this.Value = null;
+		this.Parent = null;
+		this.LeftChild = null;
+		this.RightChild = null;
+		this.isNull = true;
 	}
 	
 	@Override
@@ -78,7 +91,7 @@ public class RBTNode<T extends Comparable<T>,V> implements INode<T, V> {
 
 	@Override
 	public boolean isNull() {
-		return false;
+		return this.isNull;
 	}
 
 }
