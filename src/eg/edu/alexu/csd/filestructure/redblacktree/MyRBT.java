@@ -96,12 +96,26 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	
 	private void deleteBST(INode<T, V> node) {
 
-		INode<T,V> left = node.getLeftChild(), right = node.getRightChild();
-		INode<T,V> replacedNode = null;
+		INode<T,V> left = node.getLeftChild(), right = node.getRightChild(), parent = node.getParent();
+		INode<T,V> replacedNode = nullNode;
 		
 		if (left.isNull() && right.isNull()) // Node has no children
 		{
 			node.setParent(null);
+			if (parent == null) //Deleting root node
+			{
+				root = nullNode;
+				size = 0;
+				return;
+			}
+			else
+			{
+				if (node == parent.getRightChild()) // Node is a right child
+					parent.setRightChild(nullNode);
+				else
+					parent.setLeftChild(nullNode);
+				
+			}
 		}
 		else if (left.isNull()) // Node has only right child
 		{
@@ -114,8 +128,12 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			}
 			else
 			{
-				INode<T,V> parent = node.getParent();
-				parent.setRightChild(right);
+				if (node == parent.getLeftChild()) //Deleted Node is a left child
+					parent.setLeftChild(right);
+				else
+					parent.setRightChild(right);		
+				
+				right.setParent(parent);
 				node.setParent(null);
 				node.setRightChild(null);
 			}
@@ -131,11 +149,34 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			}
 			else
 			{
-				INode<T,V> parent = node.getParent();
-				parent.setLeftChild(left);
+				if (node == parent.getLeftChild()) // Deleted node is a left child
+					parent.setLeftChild(left);
+				else
+					parent.setRightChild(left);
+					
+				left.setParent(parent);
 				node.setParent(null);
 				node.setLeftChild(null);
 			}
+		}
+		
+		if (replacedNode.isNull()) // Deleting a leaf node
+		{
+			if (parent.getLeftChild().isNull() && parent.getRightChild().isNull()) //Deletion makes parent leaf node
+			{
+				if (parent.getColor() == INode.BLACK)
+				{
+					fixDoubleBlack(parent);
+					return;
+				}
+				else
+				{
+					parent.setColor(INode.RED);
+					return;
+				}
+			}
+			else
+				return;
 		}
 		
 		if (replacedNode.getColor() == INode.RED || node.getColor() == INode.RED)
@@ -148,6 +189,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			fixDoubleBlack(doubleBlack);
 		}
 		
+		
 	}
 	
 	private void fixDoubleBlack(INode<T, V> doubleBlack) {
@@ -155,13 +197,81 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			return;
 		
 		INode<T,V> parent = doubleBlack.getParent();
-		INode<T,V> sibling = null;
+		INode<T,V> sibling ;
 		if (parent.getLeftChild() == doubleBlack) // If the double black node is the left child
 			sibling = parent.getRightChild();
 		else // Double Black node is the right child
 			sibling = parent.getLeftChild();
 		
-		
+		if (sibling.getColor() == INode.RED)
+		{
+			if (doubleBlack == parent.getLeftChild())
+			{
+				LeftRotation(parent);
+				fixDoubleBlack(doubleBlack);
+			}
+			else
+			{
+				RightRotation(parent);
+				fixDoubleBlack(doubleBlack);
+			}
+		}
+		else // Black Sibling
+		{
+			if (sibling.getLeftChild().getColor() == INode.BLACK && sibling.getRightChild().getColor() == INode.BLACK)
+			{
+				sibling.setColor(INode.RED);
+				
+				if (parent.getColor() == INode.RED)
+				{
+					parent.setColor(INode.BLACK);
+					return;
+				}
+				else // Black Parent
+				{
+					fixDoubleBlack(parent); // Pop the Double Black Node up
+				}
+			}
+			else // At least one red child
+			{
+				INode<T,V> red;
+				if (sibling.getRightChild().getColor() == INode.RED) // XR case
+				{
+					red = sibling.getRightChild();
+					if (sibling == parent.getRightChild()) // RR case
+					{
+						LeftRotation(parent);
+						red.setColor(parent.getColor());
+						return;
+					}
+					else // LR case
+					{
+						LeftRotation(sibling);
+						red.setColor(INode.BLACK);
+						sibling.setColor(INode.RED);
+						fixDoubleBlack(doubleBlack);
+					}
+				}
+					
+				else // XL case
+				{
+					red = sibling.getLeftChild();
+					if (sibling == parent.getRightChild()) // RL case
+					{
+						RightRotation(sibling);
+						red.setColor(INode.BLACK);
+						sibling.setColor(INode.RED);
+						fixDoubleBlack(doubleBlack);
+					}
+					else // LL case
+					{
+						RightRotation(parent);
+						red.setColor(parent.getColor());
+						return;
+					}
+				}
+			}
+		}
 		
 	}
 
