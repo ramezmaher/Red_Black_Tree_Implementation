@@ -63,6 +63,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 		else {
 			addTo(node,root);
+			checkViolation(root);
 		}
 		node.setLeftChild(nullNode);
 		node.setRightChild(nullNode);
@@ -213,10 +214,71 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 	}
 	
-	private void fixTree() {
+	private void checkViolation(INode<T,V> node) {
+		if (node.isNull())
+			return;
+		if ( node.getParent()==null && node.getColor() == INode.RED) {
+			node.setColor(INode.BLACK);
+		    checkViolation(node.getLeftChild());
+		    checkViolation(node.getRightChild());
+		}
+		else if (node.getColor()==INode.RED && node.getParent().getColor()==INode.RED) {
+			if (getUncleColor(node)==INode.RED) {
+				reColor(node);
+				checkViolation(root);
+			}
+			else {
+			 if (isLeftChild(node)) {
+				if (isLeftChild(node.getParent())) {
+					LeftLeftCase(node);
+					checkViolation(root);
+				}
+				else {
+					LeftRightCase(node);
+					checkViolation(root);
+				}
+			 }
+			 else {
+				 if (isLeftChild(node.getParent())) {
+					 RightLeftCase(node);
+					 checkViolation(root);
+				 }
+				 else {
+					 RightRightCase(node);
+					 checkViolation(root);
+				 }
+			 }
+			}
+		}
+	}
+	private void ColorSwap(INode<T,V> node1,INode<T,V> node2) {
+		if (node1.getColor()==INode.BLACK) {
+			node1.setColor(INode.RED);
+			node2.setColor(INode.BLACK);
+		}
+		else {
+			node1.setColor(INode.BLACK);
+			node2.setColor(INode.RED);
+		}
 		
 	}
-	private void checkViolation() {}
+	private boolean getUncleColor(INode<T,V> node) {
+		INode<T,V> grandParent = node.getParent().getParent();
+		INode<T,V> Parent = node.getParent();
+		if (grandParent.getLeftChild().getKey().compareTo(Parent.getKey()) == 0) {
+			return grandParent.getRightChild().getColor();
+		}
+		else return grandParent.getLeftChild().getColor();
+	} 
+	
+	private boolean isLeftChild(INode<T,V> node) {
+		INode<T,V> Parent  = node.getParent();
+		if (node.getColor() == Parent.getLeftChild().getColor()) {
+			if (node.getKey().compareTo(Parent.getLeftChild().getKey()) == 0)
+				return true;
+		}
+		return false;
+	}
 	
 	private void LeftRotation(INode<T,V> node) {
 		if (node.isNull() || node.getLeftChild().isNull())
@@ -263,6 +325,14 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		dummy2.setParent(node);
 		return;
 	}
+    private void reColor(INode<T,V> node) {
+    	if (node.getParent().isNull() || node.getParent().getParent().isNull())
+    		return;
+    		INode<T,V> dummy = node.getParent().getParent();
+    		dummy.setColor(INode.RED);
+    		dummy.getLeftChild().setColor(INode.BLACK);
+    		dummy.getRightChild().setColor(INode.BLACK);
+    }
 	
     private void printTree(INode<T,V> node) {
 		if (node.isNull())
@@ -279,7 +349,37 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 	}
 	
+    private void LeftLeftCase(INode<T,V> node) {
+    	INode<T,V> grandParent = node.getParent().getParent();
+    	INode<T,V> parent = node.getParent();
+    	
+    	RightRotation(grandParent);
+    	ColorSwap(grandParent,parent);
+    	
+    } 
+
+    private void LeftRightCase(INode<T,V> node) {
+    	INode<T,V> parent = node.getParent();
+    	
+    	LeftRotation(parent);
+    	LeftLeftCase(parent);
+    	
+    }
     
+    private void RightRightCase(INode<T,V> node) {
+    	INode<T,V> grandParent = node.getParent().getParent();
+    	INode<T,V> parent = node.getParent();
+    	
+    	LeftRotation(grandParent);
+    	ColorSwap(grandParent,parent);
+    }
+    
+    private void RightLeftCase(INode<T,V> node) {
+    	INode<T,V> parent = node.getParent();
+    	
+    	RightRotation(parent);
+    	RightRightCase(parent);
+    }
     
     public static void main(String[] args) {
 	    MyRBT<Integer,String> tree = new MyRBT<Integer,String>();
