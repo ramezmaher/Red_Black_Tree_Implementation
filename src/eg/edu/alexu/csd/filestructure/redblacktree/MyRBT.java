@@ -20,13 +20,13 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		else throw new IllegalAccessError("Tree is empty,no root to fetch");
 	}
 
-	
 	public boolean isEmpty() {
 		if (size == 0)
 		    return true;
 		else 
 			return false;
 	}
+	
 	@Override
 	public void clear() {
 		if (root.isNull())
@@ -39,16 +39,20 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 
 	@Override
 	public V search(T key) {
+		if (key==null)
+			return null;
 		INode<T,V> node = Find(key,root);
-		if (node.isNull())
+		if (node==null)
 		return null;
 		else return node.getValue();
 	}
 
 	@Override
 	public boolean contains(T key) {
+		if (key == null)
+			return false;
 		INode<T,V> node= Find(key,root);
-		if(node.isNull())
+		if(node == null)
 			return false;
 		else return true;
 		
@@ -337,12 +341,10 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 		else if (node.getColor()==INode.RED && node.getParent().getColor()==INode.RED) {
 			if (getUncleColor(node)==INode.RED) {
-				System.out.println("Uncle red " + node.getKey());
 				reColor(node);
 				checkViolation(root);
 			}
 			else {
-				System.out.println("Uncle black " + node.getKey());
 			 if (isLeftChild(node)) {
 				if (isLeftChild(node.getParent())) {
 					LeftLeftCase(node);
@@ -382,6 +384,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 		
 	}
+	
 	private boolean getUncleColor(INode<T,V> node) {
 		INode<T,V> grandParent = node.getParent().getParent();
 		INode<T,V> Parent = node.getParent();
@@ -451,6 +454,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		
 		return;
 	}
+    
     private void reColor(INode<T,V> node) {
     	if (node.getParent().isNull() || node.getParent().getParent().isNull())
     		return;
@@ -518,5 +522,16 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    tree.insert(1, "hu");
 	    tree.insert(0, "hu");
 	    tree.printTree(tree.getRoot());
+	    
+	    System.out.println("");
+	    System.out.println(tree.isEmpty());
+	    System.out.println(tree.contains(8));
+	    System.out.println(tree.contains(9));
+	    System.out.println(tree.contains(null));
+	    System.out.println("");
+	    System.out.println(tree.search(8));
+	    System.out.println(tree.search(9));
+	    System.out.println(tree.search(null));
+	    
 	}
 }
