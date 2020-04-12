@@ -6,10 +6,13 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	private INode<T,V> root;
 	private int size;
 	private INode<T,V> nullNode;
+	private INode<T,V> smallest,largest ;
 	
 	public MyRBT(){
 		size = 0 ;
-		nullNode = new RBTNode();
+		nullNode = new RBTNode<T,V>();
+		smallest = null;
+		largest = null;
 		root = nullNode;
 		
 	}
@@ -66,13 +69,26 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		if (size==0) {
 			node.setColor(INode.BLACK);
 			root=node;
-			size++;
+			smallest = node;
+			largest = node;
 		}
 		else {
 			addTo(node,root);
 			checkViolation(root);
-			size++;
 		}
+
+		int check = key.compareTo(smallest.getKey());
+		if (check < 0)
+			smallest = node;
+		
+		check = key.compareTo(largest.getKey());
+		if (check > 0)
+			largest = node;
+		
+		size++;
+		node.setLeftChild(nullNode);
+		node.setRightChild(nullNode);
+
 	}
 
 	@Override
@@ -81,6 +97,23 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		
 		if (node.isNull())
 			return false;
+		
+		if (node == smallest)
+		{
+			INode<T,V> successor = getSuccessor(node);
+			if (!successor.isNull())
+				smallest = successor;
+			else
+				smallest = null;
+		}
+		if (node == largest)
+		{
+			INode<T,V> predecessor = getPredecessor(node);
+			if (!predecessor.isNull())
+				largest = predecessor;
+			else
+				largest = null;
+		}
 		
 		INode<T,V> left = node.getLeftChild();
 		INode<T,V> right = node.getRightChild();
@@ -96,8 +129,14 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		{
 			deleteBST(node);
 		}
-		
+
+		size--;
 		return true;
+	}
+	
+	public int size()
+	{
+		return this.size;
 	}
 	
 	private void deleteBST(INode<T, V> node) {
@@ -281,18 +320,69 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		
 	}
 
-	private INode<T, V> getSuccessor(INode<T, V> node) {
+	public INode<T, V> getSuccessor(INode<T, V> node) {
 		
-		INode<T,V> newNode = node.getRightChild();
+		if (node == largest)
+			return nullNode;
 		
-		while (!newNode.getLeftChild().isNull()) // While newNode has left child
+		INode<T,V> newNode;
+		if (!node.getRightChild().isNull()) // Node has right child
 		{
-			newNode = newNode.getLeftChild();
+			newNode = node.getRightChild();
+			while (!newNode.getLeftChild().isNull()) // While newNode has left child
+			{
+				newNode = newNode.getLeftChild();
+			}
+		}
+		else
+		{
+			newNode = node.getParent();
+			while (node == newNode.getRightChild()) // While node is the right child
+			{
+				node = newNode;
+				newNode = newNode.getParent();
+			}
 		}
 		
 		return newNode;
 	}
+	
+	public INode<T,V> getPredecessor(INode<T,V> node)
+	{
+		if (node == smallest)
+			return nullNode;
+		
+		INode<T,V> newNode;
+		if (!node.getLeftChild().isNull()) // Node has left child
+		{
+			newNode = node.getLeftChild();
+			while (!newNode.getRightChild().isNull()) // While newNode has right child
+			{
+				newNode = newNode.getRightChild();
+			}
+		}
+		else
+		{
+			newNode = node.getParent();
+			while (node == newNode.getLeftChild()) // While node is the left child
+			{
+				node = newNode;
+				newNode = newNode.getParent();
+			}
+		}
+		return newNode;
+	}
 
+	public INode<T,V> getSmallest()
+	{
+		return this.smallest;
+	}
+	
+	public INode<T,V> getLargest()
+	{
+		return this.largest;
+	}
+	
 	private void addTo(INode<T,V> nodeToAdd,INode<T,V> parentNode) {
 		int check = nodeToAdd.getKey().compareTo(parentNode.getKey());
 		if (check < 0) {
@@ -521,6 +611,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    tree.insert(15, "ho");
 	    tree.insert(2, "he");
 	    tree.insert(300, "ha");
+	    
+	    // System.out.println("Smallest here is: "+tree.smallest.getKey()+", Largest here is: "+tree.largest.getKey());
 	    tree.insert(4, "hu");
 	    tree.insert(14, "hu");
 	    tree.insert(16, "hu");
@@ -528,6 +620,27 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    tree.insert(1, "hu");
 	    tree.insert(0, "hu");
 	    
+	    /*
+	    System.out.println("Smallest here is: "+tree.smallest.getKey()+", Largest here is: "+tree.largest.getKey());
+	    
+	    System.out.println("Checking successor method");
+	    INode node = tree.getSmallest();
+	    while (!node.isNull())
+	    {
+	    	System.out.println(node.getKey());
+	    	node = tree.getSuccessor(node);
+	    }
+	    
+	    System.out.println("Check predecessor method");
+	    INode node2 = tree.getLargest();
+	    while (!node2.isNull())
+	    {
+	    	System.out.println(node2.getKey());
+	    	node2 = tree.getPredecessor(node2);
+	    }
+	    /*
+	    System.out.println("Before Rotation");
+
 	    tree.printTree(tree.getRoot());
 	    
 	    while (!tree.isEmpty()) {
@@ -535,6 +648,14 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    	System.out.println("");
 	    	tree.printTree(tree.getRoot());
 	    }
+
+	    System.out.println();
+	    System.out.println("After Rotation");
+	    tree.printTree(tree.getRoot());
+		*/
 	    
+	    
+
+
 	}
 }
