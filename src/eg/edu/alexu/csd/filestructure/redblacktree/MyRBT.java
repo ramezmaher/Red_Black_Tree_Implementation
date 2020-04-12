@@ -527,10 +527,14 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    tree.insert(9, "hu");
 	    tree.insert(1, "hu");
 	    tree.insert(0, "hu");
+	    
 	    tree.printTree(tree.getRoot());
-	    System.out.println("");
-	    System.out.println(tree.delete(9));
-	    System.out.println("");
-	    tree.printTree(tree.getRoot());
+	    
+	    while (!tree.isEmpty()) {
+	    	tree.delete(tree.getRoot().getKey());
+	    	System.out.println("");
+	    	tree.printTree(tree.getRoot());
+	    }
+	    
 	}
 }
