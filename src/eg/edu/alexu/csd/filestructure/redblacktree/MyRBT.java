@@ -17,7 +17,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	public INode<T, V> getRoot() {
 		if (size>0)
 		return root;
-		else throw new IllegalAccessError("Tree is empty,no root to fetch");
+		else return null;
 	}
 
 	public boolean isEmpty() {
@@ -42,7 +42,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		if (key==null)
 			return null;
 		INode<T,V> node = Find(key,root);
-		if (node==null)
+		if (node.isNull())
 		return null;
 		else return node.getValue();
 	}
@@ -52,7 +52,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		if (key == null)
 			return false;
 		INode<T,V> node= Find(key,root);
-		if(node == null)
+		if(node.isNull())
 			return false;
 		else return true;
 		
@@ -315,17 +315,19 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	}
 
  	private INode<T,V> Find(T key,INode<T,V> node) {
+ 		if (node.isNull())
+ 			return nullNode;
 		int check = node.getKey().compareTo(key);
 		if (check==0)
 			return node;
 		else if (check < 0) {
 			if (node.getRightChild().isNull())
-				return null;
+				return nullNode;
 			else return Find(key,node.getRightChild());
 		}
 		else {
 			if (node.getLeftChild().isNull())
-				return null;
+				return nullNode;
 			else return Find(key,node.getLeftChild());
 		}
 	}
@@ -465,6 +467,10 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
     }
 	
     private void printTree(INode<T,V> node) {
+    	if (node==null) {
+    		System.out.println("Nothing to print");
+    		return;
+    	}
 		Queue<INode<T,V>> q = new LinkedList<INode<T,V>>();
 		q.add(node);
 		while (!q.isEmpty()) {
@@ -522,16 +528,10 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	    tree.insert(1, "hu");
 	    tree.insert(0, "hu");
 	    tree.printTree(tree.getRoot());
-	    
-	    System.out.println("");
-	    System.out.println(tree.isEmpty());
-	    System.out.println(tree.contains(8));
-	    System.out.println(tree.contains(9));
-	    System.out.println(tree.contains(null));
-	    System.out.println("");
-	    System.out.println(tree.search(8));
-	    System.out.println(tree.search(9));
-	    System.out.println(tree.search(null));
-	    
+	   // tree.clear();
+	    System.out.println(tree.delete(9));
+	    System.out.println(tree.search(4));
+	    System.out.println(tree.contains(2));
+	   // tree.printTree(tree.getRoot());
 	}
 }
