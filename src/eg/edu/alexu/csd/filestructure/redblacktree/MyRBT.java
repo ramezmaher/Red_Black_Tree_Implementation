@@ -1,12 +1,15 @@
 package eg.edu.alexu.csd.filestructure.redblacktree;
 import java.util.*;
 
+import javax.management.RuntimeErrorException;
+
 
 public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	private INode<T,V> root;
 	private int size;
 	private INode<T,V> nullNode;
 	private INode<T,V> smallest,largest ;
+	private Error ex;
 	
 	public MyRBT(){
 		size = 0 ;
@@ -20,7 +23,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	public INode<T, V> getRoot() {
 		if (size>0)
 		return root;
-		else return null;
+		else throw new RuntimeErrorException(ex);
 	}
 
 	public boolean isEmpty() {
@@ -43,7 +46,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	@Override
 	public V search(T key) {
 		if (key==null)
-			return null;
+			throw new RuntimeErrorException(ex);
 		INode<T,V> node = Find(key,root);
 		if (node.isNull())
 		return null;
@@ -53,7 +56,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	@Override
 	public boolean contains(T key) {
 		if (key == null)
-			return false;
+			throw new RuntimeErrorException(ex);
 		INode<T,V> node= Find(key,root);
 		if(node.isNull())
 			return false;
@@ -63,6 +66,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 
 	@Override
 	public void insert(T key, V value) {
+		if (key==null || value==null)
+			throw new RuntimeErrorException(ex);
 		INode<T,V> node=new RBTNode<T,V>(key,value);
 		node.setLeftChild(nullNode);
 		node.setRightChild(nullNode);
@@ -86,13 +91,13 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			largest = node;
 		
 		size++;
-		node.setLeftChild(nullNode);
-		node.setRightChild(nullNode);
 
 	}
 
 	@Override
 	public boolean delete(T key) {
+		if (key==null)
+			throw new RuntimeErrorException(ex);
 		INode<T,V> node = Find(key,root);
 		
 		if (node.isNull())
@@ -384,6 +389,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	}
 	
 	private void addTo(INode<T,V> nodeToAdd,INode<T,V> parentNode) {
+		if (nodeToAdd.isNull() || parentNode.isNull())
+			return;
 		int check = nodeToAdd.getKey().compareTo(parentNode.getKey());
 		if (check < 0) {
 			if (parentNode.getLeftChild().isNull()) {
@@ -437,8 +444,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 				checkViolation(root);
 			}
 			else {
-			 if (isLeftChild(node)) {
-				if (isLeftChild(node.getParent())) {
+			 if (isLeftChild(node.getParent())) {
+				if (isLeftChild(node)) {
 					LeftLeftCase(node);
 					checkViolation(root);
 				}
@@ -448,7 +455,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 				}
 			 }
 			 else {
-				 if (isLeftChild(node.getParent())) {
+				 if (isLeftChild(node)) {
 					 RightLeftCase(node);
 					 checkViolation(root);
 				 }
@@ -606,20 +613,18 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
     }
     
     public static void main(String[] args) {
-	    MyRBT<Integer,String> tree = new MyRBT<Integer,String>();
-	    tree.insert(10, "hi");
-	    tree.insert(15, "ho");
-	    tree.insert(2, "he");
-	    tree.insert(300, "ha");
-	    
-	    // System.out.println("Smallest here is: "+tree.smallest.getKey()+", Largest here is: "+tree.largest.getKey());
-	    tree.insert(4, "hu");
-	    tree.insert(14, "hu");
-	    tree.insert(16, "hu");
-	    tree.insert(9, "hu");
-	    tree.insert(1, "hu");
-	    tree.insert(0, "hu");
-	    
+	    MyRBT<Integer,String> Tree = new MyRBT<Integer,String>();
+	    Tree.insert(20, "soso");
+		Tree.insert(15, "soso");
+		Tree.insert(10, "soso");
+		Tree.insert(7, "soso");
+		Tree.insert(9, "soso");
+		Tree.insert(12, "soso");
+		Tree.insert(24, "soso");
+		Tree.insert(22, "soso");
+		Tree.insert(13, "soso");
+		Tree.insert(11, "soso");
+		Tree.printTree(Tree.getRoot());
 	    /*
 	    System.out.println("Smallest here is: "+tree.smallest.getKey()+", Largest here is: "+tree.largest.getKey());
 	    
