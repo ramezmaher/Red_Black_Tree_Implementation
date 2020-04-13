@@ -78,8 +78,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			largest = node;
 		}
 		else {
-			addTo(node,root);
-			checkViolation(root);
+			addTo(node);
+			checkViolation();
 		}
 		int check = key.compareTo(smallest.getKey());
 		if (check < 0)
@@ -422,6 +422,37 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			parentNode.setValue(nodeToAdd.getValue());
 		}
 	}
+	
+	private void addTo(INode<T,V> node) {
+		if(node.isNull())
+			return;
+		int check;
+		INode<T,V> ref = root;
+		while(true) {
+			check = node.getKey().compareTo(ref.getKey());
+			if (check < 0) {
+				if (ref.getLeftChild().isNull()) {
+					ref.setLeftChild(node);
+					node.setParent(ref);
+					break;
+				}
+				else ref=ref.getLeftChild();
+			}
+			else if(check > 0) {
+				if (ref.getRightChild().isNull()) {
+					ref.setRightChild(node);
+					node.setParent(ref);
+					break;
+				}
+				else ref=ref.getRightChild();
+			}
+			else {
+				ref.setValue(node.getValue());
+				break;
+			}
+		}
+		
+	}
 
  	private INode<T,V> Find(T key,INode<T,V> node) {
  		if (node.isNull())
@@ -476,6 +507,60 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		checkViolation(node.getLeftChild());
 		checkViolation(node.getRightChild());
 		}
+	}
+	
+	private void checkViolation() {
+		INode<T,V> ref,parent;
+		Queue<INode<T,V>> q = new LinkedList<INode<T,V>>();
+		q.add(root);
+		while (!q.isEmpty()) {
+			ref = q.poll();
+			parent = ref.getParent();
+		if (ref.getColor()==INode.RED && parent.getColor()==INode.RED) {
+			if (getUncleColor(ref)==INode.RED) {
+				reColor(ref);
+				ref = root;
+				q.clear();
+				q.add(ref);
+			}
+			else {
+			 if (isLeftChild(parent)) {
+				if (isLeftChild(ref)) {
+					LeftLeftCase(ref);
+					ref = root;
+					q.clear();
+					q.add(ref);
+				}
+				else {
+					LeftRightCase(ref);
+					ref = root;
+					q.clear();
+					q.add(ref);
+				}
+			 }
+			 else {
+				 if (isLeftChild(ref)) {
+					 RightLeftCase(ref);
+					 ref = root;
+					 q.clear();
+					 q.add(ref);
+				 }
+				 else {
+					 RightRightCase(ref);
+					 ref = root ;
+					 q.clear();
+					 q.add(ref);
+				 }
+			   }
+		    }
+		}
+		else {
+		    if (!ref.getLeftChild().isNull())
+		    	q.add(ref.getLeftChild());
+		    if(!ref.getRightChild().isNull())
+		    	q.add(ref.getRightChild());
+		}
+	}
 	}
 	
 	private void ColorSwap(INode<T,V> node1,INode<T,V> node2) {
