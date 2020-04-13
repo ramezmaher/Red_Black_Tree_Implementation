@@ -81,7 +81,6 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			addTo(node,root);
 			checkViolation(root);
 		}
-
 		int check = key.compareTo(smallest.getKey());
 		if (check < 0)
 			smallest = node;
@@ -443,15 +442,9 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	}
 	
 	private void checkViolation(INode<T,V> node) {
-		if (node.isNull()) {
+		if (node.isNull() || node==null)
 			return;
-		}
-		if ( node.getParent()==null && node.getColor() == INode.RED) {
-			node.setColor(INode.BLACK);
-		    checkViolation(node.getLeftChild());
-		    checkViolation(node.getRightChild());
-		}
-		else if (node.getColor()==INode.RED && node.getParent().getColor()==INode.RED) {
+		if (node.getColor()==INode.RED && node.getParent().getColor()==INode.RED) {
 			if (getUncleColor(node)==INode.RED) {
 				reColor(node);
 				checkViolation(root);
@@ -571,7 +564,9 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
     	if (node.getParent().isNull() || node.getParent().getParent().isNull())
     		return;
     		INode<T,V> dummy = node.getParent().getParent();
+    		if (dummy.getParent() != null) {
     		dummy.setColor(INode.RED);
+    		}
     		dummy.getLeftChild().setColor(INode.BLACK);
     		dummy.getRightChild().setColor(INode.BLACK);
     }
