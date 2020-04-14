@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
@@ -244,7 +245,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	@Override
 	public Set<T> keySet() {
 		
-		Set<T> result = new HashSet<T>();
+		Set<T> result = new LinkedHashSet<T>();
 		
 		if (tree.isEmpty())
 			return result;
