@@ -3,11 +3,14 @@ package eg.edu.alexu.csd.filestructure.redblacktree;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -97,16 +100,21 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public Set<Entry<T, V>> entrySet() {
 		
 		Set<Entry<T,V>> result = new HashSet<Entry<T,V>>();
+		Queue<INode<T,V>> q = new LinkedList<INode<T,V>>();
 		
 		if (tree.isEmpty())
 			return result;
 		
-		T key = tree.getSmallest();
-		while (key != null)
+		INode<T,V> node = tree.getRoot();
+		while (!q.isEmpty())
 		{
-			Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(key, tree.search(key));
+			if (!node.getLeftChild().isNull())
+				q.add(node.getLeftChild());
+			if (!node.getRightChild().isNull())
+				q.add(node.getRightChild());
+			node = q.poll();
+			Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(node.getKey(), tree.search(node.getKey()));
 			result.add(entry);
-			key = tree.getSuccessor(tree.Find(key, tree.getRoot())).getKey();
 		}
 		return result;
 	}
@@ -345,19 +353,25 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		return result;
 	}
 	public static void main(String[] args) {
-    ITreeMap<Integer, String> treemap = (ITreeMap<Integer, String>) TestRunner.getImplementationInstanceForInterface(ITreeMap.class);
+ITreeMap<Integer, String> treemap = (ITreeMap<Integer, String>) TestRunner.getImplementationInstanceForInterface(ITreeMap.class);
+		
 			TreeMap<Integer, String> t = new TreeMap<>();
-			Assert.assertEquals(t.lastEntry(), treemap.lastEntry());
-			t.put(5, "soso" + 5);
-			treemap.put(5, "soso" + 5);
-			Assert.assertEquals(t.lastEntry(), treemap.lastEntry());	
 			Random r = new Random();
-			for (int i = 0; i < 1000; i++) {
-				int key = r.nextInt(100000);
-				t.put(key, "soso" + key);
-				treemap.put(key, "soso" + key);
+			ArrayList<Integer> keys = new ArrayList<>();
+			for (int i = 0; i < 10000; i++) {
+				int key = r.nextInt(1000000);
+				String val = "" + r.nextInt(10000);
+				treemap.put(key, val);
+				t.put(key, val);
+				keys.add(key);
 			}
-		System.out.println(t.lastEntry()+ " " + treemap.lastEntry());
-	}
-
+			Set<Integer> ans = treemap.keySet();
+			ArrayList<Integer> realAns = new ArrayList<>(t.keySet());
+			Collections.sort(realAns);
+			
+			int i = 0;
+			for (Integer elem : ans) {
+				System.out.println(elem+"  " +realAns.get(i++));
+			}
+}
 }
