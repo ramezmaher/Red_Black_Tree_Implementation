@@ -30,7 +30,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 			throw new RuntimeErrorException(e);
 		
-		T largestKey = tree.getLargest().getKey();
+		T largestKey = tree.getLargest();
 		int check = key.compareTo(largestKey);
 		if (check > 0)
 			return null;
@@ -42,15 +42,15 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 			return result;
 		}
 		
-		INode<T,V> smallest = tree.getSmallest();
-		check = smallest.getKey().compareTo(key);
+		T smallest = tree.getSmallest();
+		check = smallest.compareTo(key);
 		while (check < 0)
 		{
-			smallest = tree.getSuccessor(smallest);
-			check = smallest.getKey().compareTo(key);
+			smallest = tree.getSuccessor(tree.Find(smallest, tree.getRoot())).getKey();
+			check = smallest.compareTo(key);
 		}
 		
-		Entry<T,V> result = new AbstractMap.SimpleEntry<T,V>(smallest.getKey(), smallest.getValue());
+		Entry<T,V> result = new AbstractMap.SimpleEntry<T,V>(smallest, tree.search(smallest));
 		return result;
 	}
 
@@ -97,12 +97,12 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 			return result;
 		
-		INode<T,V> node = tree.getSmallest();
-		while (!node.isNull())
+		T key = tree.getSmallest();
+		while (key != null)
 		{
-			Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(node.getKey(), node.getValue());
+			Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(key, tree.search(key));
 			result.add(entry);
-			node = tree.getSuccessor(node);
+			key = tree.getSuccessor(tree.Find(key, tree.getRoot())).getKey();
 		}
 		return result;
 	}
@@ -113,8 +113,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 				throw new RuntimeErrorException(e);
 		
-		INode<T,V> smallest = tree.getSmallest();
-		Map.Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(smallest.getKey(), smallest.getValue());
+		T smallest = tree.getSmallest();
+		Map.Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(smallest, tree.search(smallest));
 		return entry;
 	}
 
@@ -124,7 +124,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 				throw new RuntimeErrorException(e);
 		
-		return tree.getSmallest().getKey();
+		return tree.getSmallest();
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 				throw new RuntimeErrorException(e);
 		
-		T smallestKey = tree.getSmallest().getKey();
+		T smallestKey = tree.getSmallest();
 		int check = key.compareTo(smallestKey);
 		if (check < 0)
 			return null;
@@ -147,7 +147,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 			return result;
 		}
 		
-		INode<T,V> largest = tree.getSmallest();
+		T largestKey = tree.getSmallest();
+		INode<T,V> largest = tree.Find(largestKey, tree.getRoot());
 		check = largest.getKey().compareTo(key);
 		while (check > 0)
 		{
@@ -180,7 +181,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	@Override
 	public ArrayList<Entry<T, V>> headMap(T toKey) {
 		
-		INode<T,V> node = tree.getSmallest();
+		T smallestKey = tree.getSmallest();
+		INode<T,V> node = tree.Find(smallestKey, tree.getRoot());
 		ArrayList<Entry<T,V>> result = new ArrayList<Entry<T,V>>();
 		
 		if (tree.isEmpty())
@@ -203,7 +205,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (!inclusive)
 			return headMap(toKey);
 		
-		INode<T,V> node = tree.getSmallest();
+		T smallestKey = tree.getSmallest();
+		INode<T,V> node = tree.Find(smallestKey, tree.getRoot());
 		ArrayList<Entry<T,V>> result = new ArrayList<Entry<T,V>>();
 		
 		if (tree.isEmpty())
@@ -228,7 +231,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 			return result;
 		
-		INode<T,V> node = tree.getSmallest();
+		T key = tree.getSmallest();
+		INode<T,V> node = tree.Find(key, tree.getRoot());
 		while (!node.isNull())
 		{
 			result.add(node.getKey());
@@ -243,8 +247,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 				throw new RuntimeErrorException(e);
 		
-		INode<T,V> largest = tree.getLargest();
-		Map.Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(largest.getKey(), largest.getValue());
+		T largest = tree.getLargest();
+		Map.Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(largest, tree.search(largest));
 		return entry;
 	}
 
@@ -254,7 +258,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 				throw new RuntimeErrorException(e);
 		
-		return tree.getLargest().getKey();
+		return tree.getLargest();
 	}
 
 	@Override
@@ -291,10 +295,11 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	@Override
 	public void putAll(Map<T, V> map) {
 		
-		ArrayList<Entry<T,V>> mappings = headMap(lastKey(), true);
-		for (int i = 0; i < mappings.size(); i++)
-			map.put(mappings.get(i).getKey(), mappings.get(i).getValue());
+		if (map == null)
+			throw new RuntimeErrorException(e);
 		
+		for (T key : map.keySet())
+			tree.insert(key, map.get(key));
 	}
 
 	@Override
@@ -320,7 +325,8 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 		if (tree.isEmpty())
 			return result;
 		
-		INode<T,V> node = tree.getSmallest();
+		T key = (T) tree.getSmallest();
+		INode<T,V> node = tree.Find(key, tree.getRoot());
 		while (!node.isNull())
 		{
 			result.add(node.getValue());

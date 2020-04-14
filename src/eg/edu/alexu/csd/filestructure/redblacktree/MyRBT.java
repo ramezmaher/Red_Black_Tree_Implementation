@@ -8,22 +8,21 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	private INode<T,V> root;
 	private int size;
 	private INode<T,V> nullNode;
-	private INode<T,V> smallest,largest ;
+	private T smallest, largest;
 	private Error ex;
 	
 	public MyRBT(){
 		size = 0 ;
 		nullNode = new RBTNode<T,V>();
-		smallest = null;
-		largest = null;
 		root = nullNode;
 		
 	}
 	
 	public INode<T, V> getRoot() {
-		if (size>0)
+		if (root.isNull() || root == null)
+			throw new RuntimeErrorException(ex);
+		
 		return root;
-		else throw new RuntimeErrorException(ex);
 	}
 
 	public boolean isEmpty() {
@@ -35,8 +34,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	
 	@Override
 	public void clear() {
-		if (root.isNull())
-			return;
+
 		root=nullNode;
 		size=0;
 		return;
@@ -74,20 +72,20 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		if (size==0) {
 			node.setColor(INode.BLACK);
 			root=node;
-			smallest = node;
-			largest = node;
+			smallest = node.getKey();
+			largest = node.getKey();
 		}
 		else {
 			addTo(node);
 			CheckViolation(node);
 		}
-		int check = key.compareTo(smallest.getKey());
+		int check = key.compareTo(smallest);
 		if (check < 0)
-			smallest = node;
+			smallest = key;
 		
-		check = key.compareTo(largest.getKey());
+		check = key.compareTo(largest);
 		if (check > 0)
-			largest = node;
+			largest = key;
 		
 		size++;
 
@@ -105,27 +103,27 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		if (size == 1)
 		{
 			root = nullNode;
-			largest = nullNode;
-			smallest = nullNode;
+			largest = null;
+			smallest = null;
 			size = 0;
 			return true;
 		}
 		
-		if (node.getKey().compareTo(smallest.getKey()) == 0)
+		if (node.getKey().compareTo(smallest) == 0)
 		{
 			INode<T,V> successor = getSuccessor(node);
-			if (!successor.isNull())
-				smallest = successor;
+			if (successor == null || successor.isNull())
+				smallest = null;
 			else
-				smallest = nullNode;
+				smallest = successor.getKey();
 		}
-		if (node.getKey().compareTo(largest.getKey()) == 0)
+		if (node.getKey().compareTo(largest) == 0)
 		{
 			INode<T,V> predecessor = getPredecessor(node);
-			if (!predecessor.isNull())
-				largest = predecessor;
+			if (predecessor == null || predecessor.isNull())
+				largest = null;
 			else
-				largest = nullNode;
+				largest = predecessor.getKey();
 		}
 		
 		INode<T,V> left = node.getLeftChild();
@@ -163,7 +161,6 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 			if (parent == null) //Deleting root node
 			{
 				root = nullNode;
-				size = 0;
 				return;
 			}
 			else
@@ -192,7 +189,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 				
 				right.setParent(parent);
 				node.setParent(null);
-				node.setRightChild(null);
+				node.setRightChild(nullNode);
 			}
 		}
 		else if (right.isNull()) // Node has only left child
@@ -213,7 +210,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 					
 				left.setParent(parent);
 				node.setParent(null);
-				node.setLeftChild(null);
+				node.setLeftChild(nullNode);
 			}
 		}
 		
@@ -257,6 +254,11 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	private void fixDoubleBlack(INode<T, V> doubleBlack) {
 		if (doubleBlack == root)
 			return;
+		
+		if (doubleBlack.getLeftChild() == null)
+			doubleBlack.setLeftChild(nullNode);
+		if (doubleBlack.getRightChild() == null)
+			doubleBlack.setRightChild(nullNode);
 		
 		INode<T,V> parent = doubleBlack.getParent();
 		INode<T,V> sibling ;
@@ -339,7 +341,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 
 	public INode<T, V> getSuccessor(INode<T, V> node) {
 		
-		if (node == largest)
+		if (node.getKey().compareTo(largest) == 0)
 			return nullNode;
 		
 		INode<T,V> newNode;
@@ -366,7 +368,9 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	
 	public INode<T,V> getPredecessor(INode<T,V> node)
 	{
-		if (node == smallest)
+		if (node == null || node.getKey() == null || smallest == null )
+			return null;
+		if (node.isNull() || (node.getKey().compareTo(smallest) == 0))
 			return nullNode;
 		
 		INode<T,V> newNode;
@@ -390,12 +394,12 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		return newNode;
 	}
 
-	public INode<T,V> getSmallest()
+	public T getSmallest()
 	{
 		return this.smallest;
 	}
 	
-	public INode<T,V> getLargest()
+	public T getLargest()
 	{
 		return this.largest;
 	}
@@ -454,7 +458,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		
 	}
 
- 	private INode<T,V> Find(T key,INode<T,V> node) {
+ 	INode<T,V> Find(T key,INode<T,V> node) {
  		if (node.isNull())
  			return nullNode;
 		int check = node.getKey().compareTo(key);
