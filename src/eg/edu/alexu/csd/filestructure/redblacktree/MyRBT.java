@@ -265,8 +265,16 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		else // Double Black node is the right child
 			sibling = parent.getLeftChild();
 		
+		if (sibling.getLeftChild() == null)
+			sibling.setLeftChild(nullNode);
+		if (sibling.getRightChild() == null)
+			sibling.setRightChild(nullNode);
+		
 		if (sibling.getColor() == INode.RED)
 		{
+			sibling.setColor(INode.BLACK);
+			parent.setColor(INode.RED);
+			
 			if (doubleBlack == parent.getLeftChild())
 			{
 				LeftRotation(parent);
