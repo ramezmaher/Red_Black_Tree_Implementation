@@ -79,7 +79,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 		else {
 			addTo(node);
-			checkViolation();
+			CheckViolation(node);
 		}
 		int check = key.compareTo(smallest.getKey());
 		if (check < 0)
@@ -509,58 +509,42 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		}
 	}
 	
-	private void checkViolation() {
-		INode<T,V> ref,parent;
-		Queue<INode<T,V>> q = new LinkedList<INode<T,V>>();
-		q.add(root);
-		while (!q.isEmpty()) {
-			ref = q.poll();
-			parent = ref.getParent();
-		if (ref.getColor()==INode.RED && parent.getColor()==INode.RED) {
-			if (getUncleColor(ref)==INode.RED) {
-				reColor(ref);
-				ref = root;
-				q.clear();
-				q.add(ref);
+	private void CheckViolation(INode<T,V> node) {
+	    	INode<T,V> dummy ,parent ;
+	    	dummy = node;
+			while (dummy.getParent() != null) {	
+			parent = dummy.getParent();
+			if (dummy.getColor()==INode.RED && dummy.getParent().getColor()==INode.RED) {
+			if (getUncleColor(dummy)==INode.RED) {
+				reColor(dummy);
+				dummy = parent;
 			}
 			else {
 			 if (isLeftChild(parent)) {
-				if (isLeftChild(ref)) {
-					LeftLeftCase(ref);
-					ref = root;
-					q.clear();
-					q.add(ref);
+				if (isLeftChild(dummy)) {
+					LeftLeftCase(dummy);
+					dummy = parent;
 				}
 				else {
-					LeftRightCase(ref);
-					ref = root;
-					q.clear();
-					q.add(ref);
+					LeftRightCase(dummy);
+					dummy = parent;
 				}
 			 }
 			 else {
-				 if (isLeftChild(ref)) {
-					 RightLeftCase(ref);
-					 ref = root;
-					 q.clear();
-					 q.add(ref);
+				 if (isLeftChild(dummy)) {
+					 RightLeftCase(dummy);
+					 dummy = parent;
 				 }
 				 else {
-					 RightRightCase(ref);
-					 ref = root ;
-					 q.clear();
-					 q.add(ref);
+					 RightRightCase(dummy);
+					 dummy = parent ;
 				 }
-			   }
-		    }
-		}
-		else {
-		    if (!ref.getLeftChild().isNull())
-		    	q.add(ref.getLeftChild());
-		    if(!ref.getRightChild().isNull())
-		    	q.add(ref.getRightChild());
-		}
-	}
+			 }
+		 }
+	   }
+			else dummy = parent;
+	 }
+	root.setColor(INode.BLACK);		
 	}
 	
 	private void ColorSwap(INode<T,V> node1,INode<T,V> node2) {
@@ -706,44 +690,13 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
     }
     
     public static void main(String[] args) {
-	    MyRBT<Integer,String> Tree = new MyRBT<Integer,String>();
-	    Tree.insert(20, "soso");
-		Tree.insert(15, "soso");
-		Tree.insert(10, "soso");
-		Tree.insert(7, "soso");
-		Tree.insert(9, "soso");
-		Tree.insert(12, "soso");
-		Tree.insert(24, "soso");
-		Tree.insert(22, "soso");
-		Tree.insert(13, "soso");
-		Tree.insert(11, "soso");
-		Tree.printTree(Tree.getRoot());
-
-	    /*
-*/
-//	    tree.printTree(tree.getRoot());
-	    
-/*	    for (int i=0; i<4 ; i++)
-	    	tree.delete(tree.getRoot().getKey());
-	    
-	    System.out.println("My root right now is "+tree.getRoot().getKey());
-	    System.out.println("My predecessor now is "+tree.getPredecessor(tree.getRoot()).getKey());
-    	
-	    
-	    while (!tree.isEmpty()) {
-	    	tree.delete(tree.getRoot().getKey());
-	    	System.out.println("");
-	    	tree.printTree(tree.getRoot());
-	    	System.out.println("MY SMALLEST IS "+tree.getSmallest().getKey()+", MY LARGEST IS "+tree.getLargest().getKey());
-	    }
-/*
-	    System.out.println();
-	    System.out.println("After Rotation");
-	    tree.printTree(tree.getRoot());
-		*/
-	    
-	    
-
+	    MyRBT<Integer,String> redBlackTree = new MyRBT<Integer,String>();
+	    Random r = new Random();
+		for(int i = 0; i < 100; i++) {
+			int key = r.nextInt(1000);
+			redBlackTree.insert(key, "toto" + key);
+			System.out.println(redBlackTree.getRoot().getKey() + " " + redBlackTree.getRoot().getColor());
+		}
 
 	}
 }
