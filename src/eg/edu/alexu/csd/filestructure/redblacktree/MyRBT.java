@@ -20,7 +20,7 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 	
 	public INode<T, V> getRoot() {
 		if (root.isNull() || root == null)
-			throw new RuntimeErrorException(ex);
+			return null;
 		
 		return root;
 	}
@@ -78,7 +78,6 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		else {
 			addTo(node);
 			CheckViolation(node);
-		}
 		int check = key.compareTo(smallest);
 		if (check < 0)
 			smallest = key;
@@ -86,9 +85,8 @@ public class MyRBT<T extends Comparable<T>,V> implements IRedBlackTree<T, V> {
 		check = key.compareTo(largest);
 		if (check > 0)
 			largest = key;
-		
+		}
 		size++;
-
 	}
 
 	@Override

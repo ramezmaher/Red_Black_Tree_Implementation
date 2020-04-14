@@ -6,10 +6,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.management.RuntimeErrorException;
+
+import org.junit.Assert;
 
 public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 
@@ -111,7 +115,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public Entry<T, V> firstEntry() {
 
 		if (tree.isEmpty())
-				throw new RuntimeErrorException(e);
+				return null;
 		
 		T smallest = tree.getSmallest();
 		Map.Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(smallest, tree.search(smallest));
@@ -122,7 +126,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public T firstKey() {
 		
 		if (tree.isEmpty())
-				throw new RuntimeErrorException(e);
+				return null;
 		
 		return tree.getSmallest();
 	}
@@ -181,6 +185,9 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	@Override
 	public ArrayList<Entry<T, V>> headMap(T toKey) {
 		
+		if (toKey==null)
+			throw new RuntimeErrorException(e);
+		
 		T smallestKey = tree.getSmallest();
 		INode<T,V> node = tree.Find(smallestKey, tree.getRoot());
 		ArrayList<Entry<T,V>> result = new ArrayList<Entry<T,V>>();
@@ -201,6 +208,9 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 
 	@Override
 	public ArrayList<Entry<T, V>> headMap(T toKey, boolean inclusive) {
+		
+		if (toKey==null)
+			throw new RuntimeErrorException(e);
 		
 		if (!inclusive)
 			return headMap(toKey);
@@ -245,7 +255,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public Entry<T, V> lastEntry() {
 		
 		if (tree.isEmpty())
-				throw new RuntimeErrorException(e);
+				return null;
 		
 		T largest = tree.getLargest();
 		Map.Entry<T,V> entry = new AbstractMap.SimpleEntry<T,V>(largest, tree.search(largest));
@@ -256,7 +266,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public T lastKey() {
 		
 		if (tree.isEmpty())
-				throw new RuntimeErrorException(e);
+				return null;
 		
 		return tree.getLargest();
 	}
@@ -265,7 +275,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public Entry<T, V> pollFirstEntry() {
 		
 		if (tree.isEmpty())
-				throw new RuntimeErrorException(e);
+				return null;
 		
 		Entry<T,V> entry = firstEntry();
 		tree.delete(entry.getKey());
@@ -276,7 +286,7 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 	public Entry<T, V> pollLastEntry() {
 		
 		if (tree.isEmpty())
-				throw new RuntimeErrorException(e);
+				return null;
 		
 		Entry<T,V> entry = lastEntry();
 		tree.delete(entry.getKey());
@@ -333,6 +343,21 @@ public class MyTreeMap<T extends Comparable<T>,V> implements ITreeMap<T, V> {
 			node = tree.getSuccessor(node);
 		}
 		return result;
+	}
+	public static void main(String[] args) {
+    ITreeMap<Integer, String> treemap = (ITreeMap<Integer, String>) TestRunner.getImplementationInstanceForInterface(ITreeMap.class);
+			TreeMap<Integer, String> t = new TreeMap<>();
+			Assert.assertEquals(t.lastEntry(), treemap.lastEntry());
+			t.put(5, "soso" + 5);
+			treemap.put(5, "soso" + 5);
+			Assert.assertEquals(t.lastEntry(), treemap.lastEntry());	
+			Random r = new Random();
+			for (int i = 0; i < 1000; i++) {
+				int key = r.nextInt(100000);
+				t.put(key, "soso" + key);
+				treemap.put(key, "soso" + key);
+			}
+		System.out.println(t.lastEntry()+ " " + treemap.lastEntry());
 	}
 
 }
